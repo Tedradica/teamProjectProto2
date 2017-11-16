@@ -1,0 +1,46 @@
+<html>
+
+<head><title>snook.ca load document</title>
+
+<script language="JavaScript">
+
+<!--//
+
+function loadworddoc(){
+
+  // var doc = new ActiveXObject("Word.Application"); // creates the word object
+  var w=new ActiveXObject('Word.Application');
+
+  doc.Visible=false; // doesn't display Word window
+
+  doc.Documents.Open("./word.docx"); // specify path to document
+
+               
+
+  //copy the content from my word document and throw it into my variable
+
+  var txt;
+
+  txt = doc.Documents("./word.docx").Content; 
+
+  document.all.myarea.value = txt;
+
+  doc.quit(0); // quit word (very important or you'll quickly chew up memory!)
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+<body>
+
+  <p><input type=button onClick="loadworddoc();" value="Load">
+
+  <p><textarea name=myarea cols=50 rows=5>nothing here yet</textarea>
+
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <style type="text/css">
+    #drop_zone{
+    height: 75px;
+    border: 1px dashed #000;
+    
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="drop_zone"> 파일 업로드 </div>
+
+
+<script>
+
+  function handleFileSelect(evt) {
+
+    //부모객체에 이벤트 전달하지 않게
+    evt.stopPropagation();
+    //브라우저으 행동을 막기 위해서 ..
+    evt.preventDefault();
+
+
+    //발생한 이벤트 중 ..  dataTransfer->files
+    var file = evt.dataTransfer.files[0];
+    var reader = new FileReader(); //파일을 읽기 위한 FileReader객체 생성
+    
+    var text;
+    reader.onload = function(event) {
+
+      var file_text = event.target.result;
+      var scripts = file_text.split('\n');
+
+      for(i = 0 ; i < scripts.length ; i ++){
+
+        if( scripts[i].split(":")[1] != undefined){
+
+          //script영역의 캐릭터영역에는 빈값을 보내기 .. 
+          var character_name = scripts[i].split(":")[0];
+          //script영역의 character_script에는 대사 보내기..
+          var character_script = scripts[i].split(":")[1];
+          //캐릭터를 포함해서 스킄립트로 보내는 경우..
+          console.log(character_name + " : " + character_script);
+
+        }else{
+
+          //얘는 캐릭터 없이 스크립트로만 보내는 경우..
+          //script영역의 캐릭터영역에는 빈값을 보내기 .. 
+          //script영역의 character_script에는 대사 보내기..
+          var script = scripts[i];
+          console.log(script);
+
+        }
+
+        //script_count 갱신 시켜주기 ..
+
+      }
+      
+    };    
+
+    reader.readAsText(file);
+
+  }
+
+  function handleDragOver(evt) {
+    console.log('dtd');
+    evt.stopPropagation();
+    evt.preventDefault();
+
+  }
+
+  // 스크립트가 떨어질 dropZone에는 이벤트를 걸어준다. 
+  var dropZone = document.getElementById('drop_zone');
+  dropZone.addEventListener('dragover', handleDragOver, false);
+  dropZone.addEventListener('drop', handleFileSelect, false);
+</script>
+
+
+</body>
+</html>

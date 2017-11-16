@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>D&D</title>
+	<script src="./js/jquery-3.2.0.min.js"></script>
+	<script src="./js/jquery-ui.min.js"></script>
+</head>
+<body>
+
+<!-- 객체 영역 -->
+객체생성<br>
+
+이름<input type="text" id="object_name" >
+속성1<input type="text" id="object_attr1" >
+속성2<input type="text" id="object_attr2" >
+속성3<input type="text" id="object_attr3" >
+
+<button onclick="create_object()">객체 생성</button><br><br>
+
+<hr>
+
+생성된 객체
+<ul id="object_place">
+
+</ul>
+
+<!-- 객체 영역 끗! -->
+<hr>
+
+<div class="delete_place" ondrop="delete_drop(event)" ondragover="allowDrop(event)" style="border:1px dotted black; width: 426px; height: 50px">
+</div>
+
+
+객체 정보
+<div id = "code_reader" ondrop="drop(event)" ondragleave="leaveDrag(event)" ondragover="allowDrop(event)" style="border:1px solid black; width: 426px; height: 100px;">
+<ul></ul>
+</div>
+<table border="1px solid black">
+	
+	<tr>
+		<td width="100px">ID</td>	
+		<td width="100px">ATTR1</td>	
+		<td width="100px">ATTR2</td>
+		<td width="100px">ATTR3</td>
+	</tr>
+
+	<tr>
+
+		<td id="id_reader" height="100px">
+			<ul></ul>
+		</td>	
+
+		<td id="attr1_reader" height="100px">
+			<ul id="attr1_reader"></ul>
+		</td>	
+
+		<td id="attr2_reader" height="100px">
+			<ul id="attr2_reader"></ul>
+		</td>
+
+		<td id="attr3_reader" height="100px">
+			<ul id="attr3_reader"></ul>
+		</td>
+
+	</tr>
+
+
+</table>
+
+<script type="text/javascript">
+
+
+var target;
+var object_array = new Array();
+var object_info = new Object();
+var jsonInfo;
+
+
+function create_object(){
+
+	//해당하는 모든 값이 있어야 만들어 짐 ..
+	if( $('#object_name').val() && $('#object_attr1').val() && 
+		$('#object_attr2').val() && $('#object_attr3').val() ){
+
+		object_info.name  = $('#object_name').val();
+		object_info.attr1 = $('#object_attr1').val();
+		object_info.attr2 = $('#object_attr2').val();
+		object_info.attr3 = $('#object_attr3').val();
+
+		object_array.push(object_info);
+		object_info = new Object();
+	}
+	console.log(object_array);
+
+    //객체가 생성되었으니, 해당 객체를 생성된 객체 영역에 넣음..
+
+	$('#object_place').empty();
+	for(var i in object_array){
+
+		var list = $('<li>').text(object_array[i].name).attr(
+			{
+			'onclick': 'view(event)',
+			'draggable':'true',
+			'ondragstart':'drag(event)',
+			'name':object_array[i].name,
+			'attr1':object_array[i].attr1,
+			'attr2':object_array[i].attr2,
+			'attr3':object_array[i].attr3,
+			'identify':i,
+			}
+			
+			).addClass('OKdrag').append($('<div>').text( '속성1 : ' + object_array[i].attr1 + ' 속성2 : ' + object_array[i].attr2 + ' 속성3 : ' + object_array[i].attr3).css("display","none"));
+
+
+		$('#object_place').append( list );
+		
+	}
+
+
+
+}
+
+// ///////////////////////////////////////////////////
+
+function view(ev){
+
+	
+	if( $(ev.target.childNodes[1]).css("display") == "none" ){
+
+		$(ev.target.childNodes[1]).show();
+
+	}else{
+		
+		$(ev.target.childNodes[1]).hide();
+	
+	}
+
+}
+
+function leaveDrag(){
+
+	document.getElementById('code_reader').style.border="1px solid black";
+
+}
+
+function allowDrop(ev) { 
+	
+	//코드분석기에서 클래스이름이 OK드래그 인 경우에만 실행됨 .. 	
+	if(ev.target.id == "code_reader" && target.className == "OKdrag"){
+	ev.preventDefault();
+	$('#code_reader').css("border","3px solid black");
+	}
+
+	ev.preventDefault(); //가 없으면 드래그앤 드롭 실행안됨
+	
+}
+
+function drag(ev) { 
+
+	console.log(ev.target);
+	target = ev.target;
+ }
+
+function delete_drop(ev){
+
+	if(target.hasAttribute('identify')){
+		var identify = target.getAttribute('identify');
+		$("li[identify_child=" + identify + "]").remove();
+
+	}
+	target.remove();
+
+}
+
+function drop(ev) { 
+
+ 	if(target.className == "OKdrag"){
+
+ 	//객체정보 (씬정보에 들어가는 코드)
+ 	$('#code_reader ul').append($('<li>').text(target.getAttribute('name')).attr(
+			{
+			'draggable':'true',
+			'ondragstart':'drag(event)',
+			'identify': target.getAttribute("identify")
+			})
+ 	);	
+	
+ 	//객체상세 정보 (각 요소에 들어가는 코드)
+	$('#id_reader').append($('<li>').text(target.getAttribute('name')).attr(
+			{
+			'draggable':'true',
+			'ondragstart':'drag(event)',
+			'identify_child':target.getAttribute("identify")
+			}));
+	$('#attr1_reader').append($('<li>').text(target.getAttribute('attr1')).attr(
+			{
+			'draggable':'true',
+			'ondragstart':'drag(event)',
+			'identify_child':target.getAttribute("identify")
+			}));
+
+	$('#attr2_reader').append($('<li>').text(target.getAttribute('attr2')).attr(
+			{
+			'draggable':'true',
+			'ondragstart':'drag(event)',
+			'identify_child':target.getAttribute("identify")
+			}));
+	$('#attr3_reader').append($('<li>').text(target.getAttribute('attr3')).attr(
+			{
+			'draggable':'true',
+			'ondragstart':'drag(event)',
+			'identify_child':target.getAttribute("identify")
+			}));
+	document.getElementById('code_reader').style.border="1px solid black";
+	}
+
+ }
+
+// $('#object_place').sortable();
+// $('#id_reader').sortable();
+// $('#code_reader ul').sortable();
+// $('#id_reader').sortable();
+// $('#attr1_reader').sortable();
+// $('#attr2_reader').sortable();
+// $('#attr3_reader').sortable();
+
+</script>
+</body>
+</html>
